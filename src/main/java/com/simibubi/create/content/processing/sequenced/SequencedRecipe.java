@@ -42,11 +42,25 @@ public class SequencedRecipe<T extends ProcessingRecipe<?, ?>> {
 		return wrapped;
 	}
 
-	void initFromSequencedAssembly(SequencedAssemblyRecipe parent, boolean isFirst) {
+void initFromSequencedAssembly(SequencedAssemblyRecipe parent, boolean isFirst) {
 		if (getAsAssemblyRecipe().supportsAssembly()) {
 			Ingredient transit = Ingredient.of(parent.getTransitionalItem());
-			wrapped.getIngredients()
-					.set(0, isFirst ? CompoundIngredient.of(transit, parent.getIngredient()) : transit);
+			var ingredients = wrapped.getIngredients();
+
+			if (ingredients.isEmpty()) {
+				com.simibubi.create.Create.LOGGER.warn("Skipping sequenced sub-recipe initialization for parent '{}': Wrapped recipe has no ingredients.", parent.getId());
+				return;
+			}
+
+			try {
+				ingredients.set(0, isFirst ? CompoundIngredient.of(transit, parent.getIngredient()) : transit);
+			} catch (UnsupportedOperationException e) {
+				com.simibubi.create.Create.LOGGER.warn("Failed to initialize sub-recipe for parent '{}': Ingredient list returned by {} is immutable.", 
+					parent.getId(), wrapped.getClass().getSimpleName());
+			} catch (Exception e) {
+				com.simibubi.create.Create.LOGGER.warn("Unexpected exception initializing sub-recipe for parent '{}': {}", 
+					parent.getId(), e.getClass().getSimpleName());
+			}
 		}
 	}
 }
