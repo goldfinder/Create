@@ -42,7 +42,7 @@ public class SequencedRecipe<T extends ProcessingRecipe<?, ?>> {
 		return wrapped;
 	}
 
-void initFromSequencedAssembly(SequencedAssemblyRecipe parent, boolean isFirst) {
+	void initFromSequencedAssembly(SequencedAssemblyRecipe parent, boolean isFirst) {
 		if (getAsAssemblyRecipe().supportsAssembly()) {
 			Ingredient transit = Ingredient.of(parent.getTransitionalItem());
 			var ingredients = wrapped.getIngredients();
